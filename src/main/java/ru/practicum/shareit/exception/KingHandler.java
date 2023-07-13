@@ -24,7 +24,7 @@ public class KingHandler {
 
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<?> entityNotFoundException (final EntityNotFoundException e) {
+    public ResponseEntity<?> entityNotFoundException(final EntityNotFoundException e) {
         return new ResponseEntity<>(new ErrorResponse(String.valueOf(e.getClass()), e.getMessage()),
                 HttpStatus.NOT_FOUND);
     }
