@@ -35,7 +35,7 @@ public class InMemoryItemRepository implements ItemRepository {
         if (item.getAvailable() == null || !item.getAvailable()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Item не доступен для share");
         }
-        User user = userRepository.getById(userOwnerId); // для валидации
+        User user = userRepository.getById(userOwnerId);
         item.setId(id);
         item.setOwner(user);
         items.put(id++, item);
@@ -45,6 +45,7 @@ public class InMemoryItemRepository implements ItemRepository {
 
     @Override
     public Item update(Long id, Item item, Long userOwnerId) {
+        itemExistValidation(id);
         Item oldItem = items.get(id);
         if (items.containsKey(id) && items.get(id).getOwner().equals(userRepository.getById(userOwnerId))) {
             if (item.getName() != null && !item.getName().isBlank()) {
@@ -69,7 +70,8 @@ public class InMemoryItemRepository implements ItemRepository {
 
     @Override
     public Item getById(Long id, Long userId) {
-        userRepository.getById(userId); // для валидации
+        itemExistValidation(id);
+        userRepository.userExistValidation(userId);
         Item item = items.get(id);
         log.info("User c ID {} получил данные Item c ID {}.", userId, id);
         return item;
@@ -77,7 +79,7 @@ public class InMemoryItemRepository implements ItemRepository {
 
     @Override
     public List<Item> getAllByOwner(Long userOwnerId) {
-        userRepository.getById(userOwnerId); // для валидации
+        userRepository.userExistValidation(userOwnerId);
         List<Item> list = items.values().stream()
                 .filter(item -> item.getOwner().getId().equals(userOwnerId))
                 .collect(Collectors.toList());
@@ -87,7 +89,8 @@ public class InMemoryItemRepository implements ItemRepository {
 
     @Override
     public void deleteById(Long id, Long userOwnerId) {
-        userRepository.getById(userOwnerId); // для валидации
+        itemExistValidation(id);
+        userRepository.userExistValidation(userOwnerId);
         if (items.containsKey(id) && items.get(id).getOwner().equals(userRepository.getById(userOwnerId))) {
             items.remove(id);
             log.info("User(Owner) с ID {} удалил  Item c ID {}.", userOwnerId, id);
@@ -102,7 +105,7 @@ public class InMemoryItemRepository implements ItemRepository {
 
     @Override
     public List<Item> search(String text, Long userId) {
-        userRepository.getById(userId); // для валидации
+        userRepository.userExistValidation(userId);
         if (text == null || text.isBlank()) {
             log.info("Получен пустой лист поиска по запросу User ID {}.", userId);
             return List.of();
@@ -113,5 +116,12 @@ public class InMemoryItemRepository implements ItemRepository {
                 .collect(Collectors.toList());
         log.info("User с ID {} получил результаты поиска по запросу {}.", userId, text);
         return itemsList;
+    }
+
+    public void itemExistValidation (long id){
+        if (!items.containsKey(id)) {
+            log.info("Item с ID {} не найден.", id);
+            throw new EntityNotFoundException("Item ID " + id + " не найден.");
+        }
     }
 }

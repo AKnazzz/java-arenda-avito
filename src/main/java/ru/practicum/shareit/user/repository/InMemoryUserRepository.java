@@ -48,13 +48,10 @@ public class InMemoryUserRepository implements UserRepository {
 
     @Override
     public User getById(Long id) {
-        if (users.containsKey(id)) {
-            User user = users.get(id);
-            log.info("User с ID {} получен .", id);
-            return user;
-        }
-        log.info("User с ID {} не найден.", id);
-        throw new EntityNotFoundException("User ID " + id + " не найден.");
+        userExistValidation(id);
+        User user = users.get(id);
+        log.info("User с ID {} получен .", id);
+        return user;
     }
 
     @Override
@@ -65,13 +62,10 @@ public class InMemoryUserRepository implements UserRepository {
 
     @Override
     public void deleteById(Long id) {
-        if (users.containsKey(id)) {
-            users.remove(id);
-            log.info("User с ID {} удалён.", id);
-        } else {
-            log.info("User с ID {} не найден.", id);
-            throw new EntityNotFoundException("User ID " + id + " не найден.");
-        }
+        userExistValidation(id);
+        users.remove(id);
+        log.info("User с ID {} удалён.", id);
+
     }
 
     private void duplicateCheck(User user) {
@@ -79,6 +73,14 @@ public class InMemoryUserRepository implements UserRepository {
             if (user.getEmail().equals(value.getEmail())) {
                 throw new EmailDuplicateException("Некорректный запрос. Данный Email уже существует.");
             }
+        }
+    }
+
+    @Override
+    public void userExistValidation(Long id) {
+        if (!users.containsKey(id)) {
+            log.info("User с ID {} не найден.", id);
+            throw new EntityNotFoundException("User ID " + id + " не найден.");
         }
     }
 

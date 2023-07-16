@@ -14,7 +14,7 @@ public class ItemMapper {
 
     public static ItemDto itemToDto(Item item) {
         if (item == null) {
-            throw new IllegalArgumentException("Item can not be null.");
+             throw new IllegalArgumentException("Item can not be null.");
         }
 
         return ItemDto.builder()
@@ -26,7 +26,6 @@ public class ItemMapper {
                 .request(item.getRequest())
                 .build();
     }
-
 
     public static Item dtoToItem(ItemDto itemDto) {
         if (itemDto == null) {
@@ -48,6 +47,3 @@ public class ItemMapper {
     }
 
 }
-
-
-

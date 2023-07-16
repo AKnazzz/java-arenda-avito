@@ -28,7 +28,6 @@ public class ItemController {
     }
 
     @PostMapping
-    @Validated
     public ResponseEntity<ItemDto> itemCreate(@Valid @RequestBody ItemDto itemDto,
             @RequestHeader(value = "X-Sharer-User-Id") Long userOwnerId) {
         log.info("Получен POST запрос по эндпоинту /items от User(Owner) c ID {} на добавление Item {}.", userOwnerId,
