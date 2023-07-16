@@ -16,5 +16,5 @@ public interface UserRepository {
 
     void deleteById(Long id);
 
-    void userExistValidation (Long id);
+    void userExistValidation(Long id);
 }

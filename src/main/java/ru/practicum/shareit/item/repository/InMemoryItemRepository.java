@@ -118,7 +118,7 @@ public class InMemoryItemRepository implements ItemRepository {
         return itemsList;
     }
 
-    public void itemExistValidation (long id){
+    public void itemExistValidation(long id) {
         if (!items.containsKey(id)) {
             log.info("Item с ID {} не найден.", id);
             throw new EntityNotFoundException("Item ID " + id + " не найден.");
