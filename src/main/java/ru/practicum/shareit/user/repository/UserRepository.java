@@ -7,4 +7,5 @@ import ru.practicum.shareit.user.model.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
+    void userExistValidation(Long id);
 }
