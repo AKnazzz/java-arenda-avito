@@ -1,21 +1,22 @@
 package ru.practicum.shareit.item.repository;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
 
-public interface ItemRepository {
+public interface ItemRepository extends JpaRepository<Item, Long> {
 
-    Item create(Item item, Long userOwnerId);
+    List<Item> findAllByOwnerIdOrderByIdAsc(Long ownerId); // все Item, принадлежат владельцу с заданным ID,
+    // отсортированные по возрастанию их ID.
 
-    Item update(Long id, Item item, Long userOwnerId);
+    @Query("select it "
+            + "from Item it "
+            + "where it.available = true "
+            + "and (lower (it.name) like concat('%', lower(?1), '%') "
+            + "or lower (it.description) like concat('%', lower(?1), '%')) ")
+    List<Item> findByText(String text); // для поиска item по тексту (части запроса)
 
-    Item getById(Long id, Long userId);
-
-    List<Item> getAllByOwner(Long userOwnerId);
-
-    void deleteById(Long id, Long userOwnerId);
-
-    List<Item> search(String text, Long userId);
-
+    void deleteItemByIdAndOwner_Id(long itemId, long userId); // удаление хозяином вещи своей вещи
 }
