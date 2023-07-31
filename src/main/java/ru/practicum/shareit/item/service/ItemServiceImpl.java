@@ -150,14 +150,16 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public CommentResponseDto addComment(CommentDto commentDto, long itemId, long userId) {
 
-        if(bookingRepository.findAllByBooker_IdAndItem_IdAndEndBefore(userId,itemId, LocalDateTime.now()).isEmpty()){
+        if (bookingRepository.findAllByBooker_IdAndItem_IdAndEndBefore(userId, itemId, LocalDateTime.now()).isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Оставлять Comment может только User, у которого есть завершённый Booking для данного Item");
         }
 
         Comment comment = CommentMapper.dtoToComment(commentDto);
-        comment.setAuthor(userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("Нет такого User.")));
-        comment.setItem(itemRepository.findById(itemId).orElseThrow(() -> new EntityNotFoundException("Нет такого Item.")));
+        comment.setAuthor(
+                userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("Нет такого User.")));
+        comment.setItem(
+                itemRepository.findById(itemId).orElseThrow(() -> new EntityNotFoundException("Нет такого Item.")));
         comment = commentRepository.save(comment);
         log.info("Добавлен Comment для Item c id = {} от User с id = {}",
                 comment.getItem().getId(), comment.getAuthor().getId());
