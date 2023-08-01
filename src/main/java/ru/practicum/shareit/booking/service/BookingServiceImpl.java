@@ -33,11 +33,13 @@ public class BookingServiceImpl implements BookingService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
 
+    private static final String BOOKING_NOT_FOUND_ERROR = "Нет такого Booking.";
+    private static final String USER_NOT_FOUND_ERROR = "Нет такого User.";
 
     @Override
     @Transactional
     public BookingResponseDto create(BookingRequestDto bookingRequestDto, Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User не найден."));
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_ERROR));
         Item item = itemRepository.findById(bookingRequestDto.getItemId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item не найден."));
         if (!item.getAvailable()) {
@@ -68,10 +70,10 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     public BookingResponseDto confirm(Long bookingId, Long userOwnerId, boolean approved) {
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new EntityNotFoundException("Booking не найден."));
+                .orElseThrow(() -> new EntityNotFoundException(BOOKING_NOT_FOUND_ERROR));
 
         if (!userRepository.existsById(userOwnerId)) {
-            throw new EntityNotFoundException("User не найден.");
+            throw new EntityNotFoundException(USER_NOT_FOUND_ERROR);
         }
 
         if (booking.getStatus().equals(StatusType.APPROVED) ||
@@ -106,7 +108,7 @@ public class BookingServiceImpl implements BookingService {
     public BookingResponseDto getById(Long bookingId, Long userId) {
 
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new EntityNotFoundException("Booking не найден."));
+                .orElseThrow(() -> new EntityNotFoundException(BOOKING_NOT_FOUND_ERROR));
 
         if (!userId.equals(booking.getBooker().getId()) && !userId.equals(booking.getItem().getOwner().getId())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
@@ -118,7 +120,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingResponseDto> getAllByBooker(int from, int size, String state, Long bookerId) {
-        User user = userRepository.findById(bookerId).orElseThrow(() -> new EntityNotFoundException("User не найден."));
+        User user = userRepository.findById(bookerId).orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_ERROR));
         List<Booking> bookList;
         switch (state) {
             case "ALL": //все
@@ -150,7 +152,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingResponseDto> getAllByOwner(int from, int size, String state, Long ownerId) {
-        userRepository.findById(ownerId).orElseThrow(() -> new EntityNotFoundException("User не найден."));
+        userRepository.findById(ownerId).orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_ERROR));
         List<Booking> bookList;
         switch (state) {
             case "ALL":

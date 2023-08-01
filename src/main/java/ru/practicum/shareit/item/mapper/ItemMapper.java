@@ -55,7 +55,6 @@ public class ItemMapper {
                 .description(itemDto.getDescription())
                 .available(itemDto.getAvailable())
                 .owner(itemDto.getOwner())
-                //  .request(itemDto.getRequest())
                 .build();
     }
 
@@ -67,6 +66,20 @@ public class ItemMapper {
         return items.stream().map(ItemMapper::toResposeItem).collect(Collectors.toList());
     }
 
+    private static BookingShortDto getLastBooking(List<Booking> bookings) {
+        if (bookings.isEmpty()) {
+            return null;
+        }
+        return new BookingShortDto(bookings.get(0).getId(), bookings.get(0).getBooker().getId());
+    }
+
+    private static BookingShortDto getNextBooking(List<Booking> bookings) {
+        if (bookings.size() <= 1 || bookings.get(1) == null) {
+            return null;
+        }
+        return new BookingShortDto(bookings.get(1).getId(), bookings.get(1).getBooker().getId());
+    }
+
     public static ItemDto itemDtoForOwner(Item item, List<Booking> bookings, List<Comment> comments) {
         return ItemDto.builder()
                 .id(item.getId())
@@ -74,14 +87,9 @@ public class ItemMapper {
                 .description(item.getDescription())
                 .available(item.getAvailable())
                 .owner(item.getOwner())
-                .lastBooking(bookings.isEmpty() || bookings.get(0) == null ? null : new BookingShortDto(
-                        bookings.get(0).getId(), bookings.get(0).getBooker().getId()
-                ))
-                .nextBooking(bookings.size() <= 1 || bookings.get(1) == null ? null : new BookingShortDto(
-                        bookings.get(1).getId(),
-                        bookings.get(1).getBooker().getId()
-                ))
-                .comments(comments)//.stream().map(CommentMapper::commentToDto).collect(Collectors.toList()))
+                .lastBooking(getLastBooking(bookings))
+                .nextBooking(getNextBooking(bookings))
+                .comments(comments)
                 .build();
     }
 

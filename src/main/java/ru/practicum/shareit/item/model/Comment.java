@@ -1,8 +1,6 @@
 package ru.practicum.shareit.item.model;
 
 import lombok.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
@@ -25,7 +23,6 @@ public class Comment {
     private String text;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Item item;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")

@@ -3,7 +3,6 @@ package ru.practicum.shareit.item.mapper;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.CommentResponseDto;
 import ru.practicum.shareit.item.model.Comment;
-import ru.practicum.shareit.user.mapper.UserMapper;
 
 import java.util.Collection;
 import java.util.List;
@@ -33,7 +32,7 @@ public class CommentMapper {
 
         return CommentResponseDto.builder()
                 .id(comment.getId())
-                .authorName(UserMapper.userToDto(comment.getAuthor()).getName())
+                .authorName(comment.getAuthor().getName())
                 .text(comment.getText())
                 .created(comment.getCreated())
                 .build();
