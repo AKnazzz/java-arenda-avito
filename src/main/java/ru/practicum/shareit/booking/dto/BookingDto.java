@@ -1,20 +1,26 @@
 package ru.practicum.shareit.booking.dto;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 import ru.practicum.shareit.booking.model.enums.StatusType;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
-@Data
+
 @Builder
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class BookingDto {
-    private Long id; // уникальный идентификатор бронирования;
-    private LocalDateTime start; // дата и время начала бронирования;
-    private LocalDateTime end; // дата и время конца бронирования;
-    private Item item; // вещь, которую пользователь бронирует;
-    private User booker; // пользователь, который осуществляет бронирование;
-    private StatusType status; // статус бронирования.
+    private Long id;
+    @NotNull(message = "Не указана дата начала бронирования")
+    private LocalDateTime start;
+    @NotNull(message = "Не указана дата окончания бронирования")
+    private LocalDateTime end;
+    private Item item;
+    private User booker;
+    private StatusType status;
 }
