@@ -36,6 +36,7 @@ public class ItemRequestMapper {
                 .created(itemRequestDto.getCreated())
                 .build();
     }
+
     public static ItemRequestResponseDto toItemRequestResponse(ItemRequest itemRequest) {
         if (itemRequest == null) {
             throw new IllegalArgumentException("ItemRequest can not be null.");

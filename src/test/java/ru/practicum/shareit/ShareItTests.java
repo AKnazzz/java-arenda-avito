@@ -9,17 +9,18 @@ import org.springframework.boot.test.context.SpringBootTest;
 @DisplayName("Тесты класса ShareItTests")
 class ShareItTests {
 
-	@Autowired
-	private ShareItApp shareItApp;
-	@Test
-	@DisplayName("Тест contextLoads")
-	void contextLoads() {
-	}
+    @Autowired
+    private ShareItApp shareItApp;
 
-	@Test
-	@DisplayName("Тест mainTest")
-	void mainTest() {
-		shareItApp.main(new String[]{});
-	}
+    @Test
+    @DisplayName("Тест contextLoads")
+    void contextLoads() {
+    }
+
+    @Test
+    @DisplayName("Тест mainTest")
+    void mainTest() {
+        shareItApp.main(new String[]{});
+    }
 
 }
