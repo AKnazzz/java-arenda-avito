@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
+@EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
 public class Booking {

@@ -53,8 +53,8 @@ public class BookingController {
     @GetMapping
     public ResponseEntity<List<BookingResponseDto>> getAllByBooker(
             @RequestParam(defaultValue = "ALL") String state,
-            @RequestParam(defaultValue = "0") @PositiveOrZero int from,
-            @RequestParam(defaultValue = "10") @Positive int size,
+            @RequestParam(defaultValue = "0", required = false) @PositiveOrZero int from,
+            @RequestParam(defaultValue = "10", required = false) @Positive int size,
             @RequestHeader("X-Sharer-User-Id") @Positive long bookerId) {
         log.info(
                 "Получен GET запрос по эндпоинту /bookings от User c ID {} на получение списка всех Booking этого User.",
@@ -65,8 +65,8 @@ public class BookingController {
     @GetMapping("/owner")
     public ResponseEntity<List<BookingResponseDto>> getAllByOwner(
             @RequestParam(defaultValue = "ALL") String state,
-            @RequestParam(defaultValue = "0") @PositiveOrZero int from,
-            @RequestParam(defaultValue = "10") @Positive int size,
+            @RequestParam(defaultValue = "0", required = false) @PositiveOrZero int from,
+            @RequestParam(defaultValue = "10", required = false) @Positive int size,
             @RequestHeader("X-Sharer-User-Id") @Positive long ownerId) {
         log.info(
                 "Получен GET запрос по эндпоинту /bookings/owner от User c ID {} на получение списка всех Booking всех "

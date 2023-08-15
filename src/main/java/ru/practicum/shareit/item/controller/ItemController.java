@@ -14,6 +14,7 @@ import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 
@@ -44,10 +45,12 @@ public class ItemController {
 
     @GetMapping
     public ResponseEntity<List<ItemResponseDto>> geAllItemsByOwner(
+            @RequestParam(defaultValue = "0", required = false) @PositiveOrZero int from,
+            @RequestParam(defaultValue = "10", required = false) @Positive int size,
             @RequestHeader(value = "X-Sharer-User-Id") Long userOwnerId) {
         log.info("Получен GET запрос по эндпоинту /items от User(Owner) c ID {} на получение списка всех своих Items.",
                 userOwnerId);
-        return new ResponseEntity<>(itemService.getAllByOwner(userOwnerId), HttpStatus.OK);
+        return new ResponseEntity<>(itemService.getAllByOwner(from, size, userOwnerId), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
@@ -69,12 +72,15 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<ItemDto>> searchItem(@RequestParam(name = "text") String text1,
+    public ResponseEntity<List<ItemDto>> searchItem(
+            @RequestParam(defaultValue = "0", required = false) @PositiveOrZero int from,
+            @RequestParam(defaultValue = "10", required = false) @Positive int size,
+            @RequestParam(name = "text") String text1,
             @RequestHeader(value = "X-Sharer-User-Id") Long userId) {
         log.info(
                 "Получен GET запрос по эндпоинту /items/search от User c ID {} на получение списка Item по запросу '{}'.",
                 userId, text1);
-        return new ResponseEntity<>(itemService.search(text1, userId), HttpStatus.OK);
+        return new ResponseEntity<>(itemService.search(from, size, text1, userId), HttpStatus.OK);
     }
 
     @PostMapping("/{itemId}/comment")

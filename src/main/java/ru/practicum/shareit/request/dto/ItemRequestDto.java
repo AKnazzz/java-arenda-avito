@@ -1,17 +1,21 @@
 package ru.practicum.shareit.request.dto;
 
-import lombok.Builder;
-import lombok.Data;
-import ru.practicum.shareit.user.model.User;
+import lombok.*;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@EqualsAndHashCode
+@Setter
 public class ItemRequestDto {
 
     private Long id; // уникальный идентификатор запроса;
+    @NotNull
     private String description; // текст запроса, содержащий описание требуемой вещи;
-    private User requestor; // пользователь, создавший запрос;
     private LocalDateTime created; // дата и время создания запроса.
 }
