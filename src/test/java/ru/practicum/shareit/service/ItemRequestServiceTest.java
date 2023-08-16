@@ -11,6 +11,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.enums.StatusType;
 import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -19,7 +21,7 @@ import ru.practicum.shareit.request.dto.ItemRequestResponseDto;
 import ru.practicum.shareit.request.mapper.ItemRequestMapper;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
-import ru.practicum.shareit.request.service.ItemRequestServiceImp;
+import ru.practicum.shareit.request.service.ItemRequestServiceImpl;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -36,13 +38,12 @@ import static org.mockito.Mockito.never;
 @DisplayName("Тесты класса ItemRequestService")
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class ItemRequestServiceTest {
-    private static final User mockUser1 = new User(1L, "Дональд", "donald@yandex.ru");
-    private static final User mockUser2 = new User(2L, "Джо", "joe@yandex.ru");
-    private static final Item mockItem1 = new Item(1L, "Серп", "Часть чего то важного", true, mockUser1, 1L);
-    private static final Item mockItem2 = new Item(2L, "Молот", "Сила заключённая в предмете", true, mockUser2, 2L);
-    private static final ItemRequest mockItemRequest1 = new ItemRequest(1L, "Требуется серп", mockUser2, LocalDateTime.of(2021, 12, 12, 1, 1, 1));
-    private static final ItemRequest mockItemRequest2 = new ItemRequest(2L, "Требуется молот", mockUser1, LocalDateTime.of(2021, 12, 12, 1, 1, 1));
-
+    private User mockUser1;
+    private User mockUser2;
+    private Item mockItem1;
+    private Item mockItem2;
+    private ItemRequest mockItemRequest1;
+    private ItemRequest mockItemRequest2;
     @Mock
     ItemRequestRepository itemRequestRepository;
     @Mock
@@ -50,14 +51,20 @@ public class ItemRequestServiceTest {
     @Mock
     UserRepository userRepository;
     @InjectMocks
-    ItemRequestServiceImp itemRequestServiceImp;
+    ItemRequestServiceImpl itemRequestServiceImpl;
 
     private MockitoSession session;
 
     @BeforeEach
     void init() {
         session = Mockito.mockitoSession().initMocks(this).startMocking();
-        itemRequestServiceImp = new ItemRequestServiceImp(itemRequestRepository, itemRepository, userRepository);
+        itemRequestServiceImpl = new ItemRequestServiceImpl(itemRequestRepository, itemRepository, userRepository);
+        mockUser1 = new User(1L, "Дональд", "donald@yandex.ru");
+        mockUser2 = new User(2L, "Джо", "joe@yandex.ru");
+        mockItem1 = new Item(1L, "Серп", "Часть чего то важного", true, mockUser1, 1L);
+        mockItem2 = new Item(2L, "Молот", "Сила заключённая в предмете", true, mockUser2, 2L);
+        mockItemRequest1 = new ItemRequest(1L, "Требуется серп", mockUser2, LocalDateTime.of(2021, 12, 12, 1, 1, 1));
+        mockItemRequest2 = new ItemRequest(2L, "Требуется молот", mockUser1, LocalDateTime.of(2021, 12, 12, 1, 1, 1));
     }
 
     @AfterEach
@@ -76,7 +83,7 @@ public class ItemRequestServiceTest {
         Mockito
                 .when(userRepository.findById(any()))
                 .thenReturn(Optional.of(mockUser1));
-        ItemRequestDto itemRequestDto2 = itemRequestServiceImp.create(itemRequestDto, mockUser1.getId());
+        ItemRequestDto itemRequestDto2 = itemRequestServiceImpl.create(itemRequestDto, mockUser1.getId());
         Mockito.verify(itemRepository, never()).save(mockItem1);
         Assertions.assertNotNull(itemRequestDto2);
         Assertions.assertEquals(itemRequestDto.getId(), itemRequestDto2.getId());
@@ -91,7 +98,7 @@ public class ItemRequestServiceTest {
         Mockito
                 .when(userRepository.findById(userId))
                 .thenReturn(Optional.empty());
-        assertThrows(EntityNotFoundException.class, () -> itemRequestServiceImp.create(itemRequestDto, userId));
+        assertThrows(EntityNotFoundException.class, () -> itemRequestServiceImpl.create(itemRequestDto, userId));
         Mockito.verify(itemRequestRepository, never()).save(any());
     }
 
@@ -111,7 +118,7 @@ public class ItemRequestServiceTest {
         Mockito
                 .when(itemRepository.findAllByRequestIdOrderByIdAsc(Mockito.any()))
                 .thenReturn(List.of());
-        List<ItemRequestResponseDto> result = itemRequestServiceImp.getAllForRequestor(user.getId());
+        List<ItemRequestResponseDto> result = itemRequestServiceImpl.getAllForRequestor(user.getId());
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1, result.size());
     }
@@ -126,7 +133,7 @@ public class ItemRequestServiceTest {
         Mockito
                 .when(itemRequestRepository.findAllByRequestor_idOrderByCreatedAsc(user.getId()))
                 .thenReturn(List.of());
-        List<ItemRequestResponseDto> result = itemRequestServiceImp.getAllForRequestor(user.getId());
+        List<ItemRequestResponseDto> result = itemRequestServiceImpl.getAllForRequestor(user.getId());
         Assertions.assertNotNull(result);
         Assertions.assertTrue(result.isEmpty());
     }
@@ -156,7 +163,7 @@ public class ItemRequestServiceTest {
                 .when(itemRepository.findAllByRequestIdOrderByIdAsc(2L))
                 .thenReturn(new ArrayList<>());
 
-        List<ItemRequestResponseDto> result = itemRequestServiceImp.getAllRequests(0, 10, user.getId());
+        List<ItemRequestResponseDto> result = itemRequestServiceImpl.getAllRequests(0, 10, user.getId());
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(2, result.size());
@@ -180,7 +187,7 @@ public class ItemRequestServiceTest {
         Mockito
                 .when(itemRepository.findAllByRequestIdOrderByIdAsc(itemRequest.getId()))
                 .thenReturn(items);
-        ItemRequestResponseDto result = itemRequestServiceImp.getById(itemRequest.getId(), user.getId());
+        ItemRequestResponseDto result = itemRequestServiceImpl.getById(itemRequest.getId(), user.getId());
         Assertions.assertNotNull(result);
         Assertions.assertEquals(itemRequest.getId(), result.getId());
         Assertions.assertEquals(2, result.getItems().size());
@@ -195,7 +202,7 @@ public class ItemRequestServiceTest {
                 .when(userRepository.findById(userId))
                 .thenReturn(Optional.empty());
         assertThrows(EntityNotFoundException.class,
-                () -> itemRequestServiceImp.getById(requestId, userId));
+                () -> itemRequestServiceImpl.getById(requestId, userId));
     }
 
     @Test
@@ -211,7 +218,7 @@ public class ItemRequestServiceTest {
                 .thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class,
-                () -> itemRequestServiceImp.getById(requestId, user.getId()));
+                () -> itemRequestServiceImpl.getById(requestId, user.getId()));
     }
 
     @Test

@@ -18,10 +18,10 @@ public class BookingRequestDto {
     private Long itemId;
     @FutureOrPresent
     @NotNull(message = "Не указана дата начала бронирования")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime start;
     @Future
     @NotNull(message = "Не указана дата окончания бронирования")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime end;
 }

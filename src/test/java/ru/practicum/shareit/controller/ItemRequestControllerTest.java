@@ -4,6 +4,7 @@ package ru.practicum.shareit.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -40,9 +41,16 @@ public class ItemRequestControllerTest {
     @MockBean
     ItemRequestService itemRequestService;
 
-    private static final User mockUser1 = new User(1L, "Дональд", "donald@yandex.ru");
-    private static final User mockUser2 = new User(2L, "Джо", "joe@yandex.ru");
-    private static final ItemRequest mockItemRequest1 = new ItemRequest(1L, "Требуется серп", mockUser2, LocalDateTime.of(2021, 12, 12, 1, 1, 1));
+    private User mockUser1;
+    private User mockUser2;
+    private ItemRequest mockItemRequest1;
+
+    @BeforeEach
+    void setUp() {
+        mockUser1 = new User(1L, "Дональд", "donald@yandex.ru");
+        mockUser2 = new User(2L, "Джо", "joe@yandex.ru");
+        mockItemRequest1 = new ItemRequest(1L, "Требуется серп", mockUser2, LocalDateTime.of(2021, 12, 12, 1, 1, 1));
+    }
 
     @Test
     @DisplayName("Тест на эндпоинт @PostMapping создания ItemRequest")

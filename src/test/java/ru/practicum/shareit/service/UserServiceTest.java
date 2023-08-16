@@ -25,8 +25,8 @@ import java.util.Optional;
 @DisplayName("Тесты класса UserService")
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class UserServiceTest {
-    private static final User mockUser1 = new User(1L, "Дональд", "donald@yandex.ru");
-    private static final User mockUser2 = new User(2L, "Джо", "joe@yandex.ru");
+    private User mockUser1;
+    private User mockUser2;
     @Mock
     UserRepository userRepository;
     UserServiceImpl userService;
@@ -37,6 +37,8 @@ public class UserServiceTest {
     void init() {
         session = Mockito.mockitoSession().initMocks(this).startMocking();
         userService = new UserServiceImpl(userRepository);
+        mockUser1 = new User(1L, "Дональд", "donald@yandex.ru");
+        mockUser2 = new User(2L, "Джо", "joe@yandex.ru");
     }
 
     @AfterEach

@@ -3,6 +3,7 @@ package ru.practicum.shareit.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -25,10 +26,12 @@ import ru.practicum.shareit.user.model.User;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -42,10 +45,18 @@ public class BookingControllerTest {
     @MockBean
     BookingService bookingService;
 
-    private static final User mockUser1 = new User(1L, "Дональд", "donald@yandex.ru");
-    private static final User mockUser2 = new User(2L, "Джо", "joe@yandex.ru");
-    private static final Item mockItem1 = new Item(1L, "Серп", "Часть чего то важного", true, mockUser1, 1L);
-    private static final Booking mockBooking1 = new Booking(1L, LocalDateTime.of(2021, 12, 12, 1, 1), LocalDateTime.of(2021, 12, 22, 1, 1), mockItem1, mockUser2, StatusType.APPROVED);
+    private User mockUser1;
+    private User mockUser2;
+    private Item mockItem1;
+    private Booking mockBooking1;
+
+    @BeforeEach
+    void setUp() {
+        mockUser1 = new User(1L, "Дональд", "donald@yandex.ru");
+        mockUser2 = new User(2L, "Джо", "joe@yandex.ru");
+        mockItem1 = new Item(1L, "Серп", "Часть чего то важного", true, mockUser1, 1L);
+        mockBooking1 = new Booking(1L, LocalDateTime.of(2021, 12, 12, 1, 1), LocalDateTime.of(2021, 12, 22, 1, 1), mockItem1, mockUser2, StatusType.APPROVED);
+    }
 
     @Test
     @DisplayName("Тест на эндпоинт @PostMapping создания Booking")
@@ -73,6 +84,10 @@ public class BookingControllerTest {
                         .characterEncoding(StandardCharsets.UTF_8)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(bookingResponseDto.getId()))
+                .andExpect(jsonPath("$.start").value(bookingResponseDto.getStart().toString()))
+                .andExpect(jsonPath("$.end").value(bookingResponseDto.getEnd().toString()))
+                .andExpect(jsonPath("$.status").value(bookingResponseDto.getStatus().toString()))
                 .andDo(print());
         Mockito.verify(bookingService).create(bookingRequestDto, 1L);
     }
@@ -83,11 +98,27 @@ public class BookingControllerTest {
     void confirmTest() {
         User user = mockUser1;
         Booking booking = mockBooking1;
+        BookingRequestDto bookingRequestDto = BookingRequestDto.builder()
+                .itemId(booking.getId())
+                .start(LocalDateTime.now().plusHours(1))
+                .end(LocalDateTime.now().plusMinutes(30))
+                .build();
+        BookingResponseDto bookingResponseDto = BookingMapper.bookingToResponse(booking);
         boolean approved = true;
+        Mockito
+                .when(bookingService.confirm(Mockito.any(), Mockito.anyLong(), Mockito.anyBoolean()))
+                .thenReturn(bookingResponseDto);
+
+        bookingService.create(bookingRequestDto, 1L);
         mockMvc.perform(patch("/bookings/{bookingId}?approved={approved}", booking.getId(), approved)
                         .header("X-Sharer-User-Id", user.getId()))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("APPROVED"))
+                .andExpect(jsonPath("$.id").value(booking.getId()))
+                .andExpect(jsonPath("$.item.id").value(mockItem1.getId()))
+                .andExpect(jsonPath("$.start").value(bookingResponseDto.getStart().toString()))
+                .andExpect(jsonPath("$.end").value(bookingResponseDto.getEnd().toString()));
 
         verify(bookingService).confirm(booking.getId(), user.getId(), approved);
     }
@@ -98,11 +129,21 @@ public class BookingControllerTest {
     void getByIdTest() {
         User user = mockUser1;
         Booking booking = mockBooking1;
+        BookingResponseDto bookingResponseDto = BookingMapper.bookingToResponse(booking);
+
+        Mockito
+                .when(bookingService.getById(Mockito.any(), Mockito.anyLong()))
+                .thenReturn(bookingResponseDto);
 
         mockMvc.perform(get("/bookings/{bookingId}", booking.getId())
                         .header("X-Sharer-User-Id", user.getId()))
                 .andExpect(status().isOk())
-                .andDo(print());
+                .andDo(print())
+                .andExpect(jsonPath("$.status").value("APPROVED"))
+                .andExpect(jsonPath("$.id").value(booking.getId()))
+                .andExpect(jsonPath("$.item.id").value(mockItem1.getId()))
+                .andExpect(jsonPath("$.start").value(bookingResponseDto.getStart().toString()))
+                .andExpect(jsonPath("$.end").value(bookingResponseDto.getEnd().toString()));
 
         verify(bookingService).getById(booking.getId(), user.getId());
     }
@@ -112,9 +153,17 @@ public class BookingControllerTest {
     @SneakyThrows
     void getAllByBookerTest() {
         User user = mockUser1;
+        Booking booking = mockBooking1;
+        BookingResponseDto bookingResponseDto = BookingMapper.bookingToResponse(booking);
+        Mockito
+                .when(bookingService.getAllByBooker(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyLong()))
+                .thenReturn((List.of(bookingResponseDto)));
         mockMvc.perform(get("/bookings")
                         .header("X-Sharer-User-Id", user.getId()))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(bookingResponseDto.getId()))
+                .andExpect(jsonPath("$[0].status").value(bookingResponseDto.getStatus().toString()))
+                .andExpect(jsonPath("$[0].item.id").value(bookingResponseDto.getItem().getId()))
                 .andDo(print());
 
         verify(bookingService).getAllByBooker(0, 10, "ALL", user.getId());
@@ -125,12 +174,19 @@ public class BookingControllerTest {
     @SneakyThrows
     void getAllByOwnerTest() {
         User user = mockUser1;
+        Booking booking = mockBooking1;
+        BookingResponseDto bookingResponseDto = BookingMapper.bookingToResponse(booking);
+        Mockito
+                .when(bookingService.getAllByOwner(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyLong()))
+                .thenReturn((List.of(bookingResponseDto)));
         mockMvc.perform(get("/bookings/owner")
                         .header("X-Sharer-User-Id", user.getId()))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(bookingResponseDto.getId()))
+                .andExpect(jsonPath("$[0].status").value(bookingResponseDto.getStatus().toString()))
+                .andExpect(jsonPath("$[0].item.id").value(bookingResponseDto.getItem().getId()))
                 .andDo(print());
 
         verify(bookingService).getAllByOwner(0, 10, "ALL", user.getId());
     }
-
 }

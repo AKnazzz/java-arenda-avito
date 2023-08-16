@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class ItemRequestServiceImp implements ItemRequestService {
+public class ItemRequestServiceImpl implements ItemRequestService {
 
     private final ItemRequestRepository itemRequestRepository;
     private final ItemRepository itemRepository;

@@ -3,6 +3,7 @@ package ru.practicum.shareit.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -34,8 +35,14 @@ public class UserControllerTest {
     @MockBean
     UserService userService;
 
-    private static final User mockUser1 = new User(1L, "Дональд", "donald@yandex.ru");
-    private static final User mockUser2 = new User(2L, "Джо", "joe@yandex.ru");
+    private User mockUser1;
+    private User mockUser2;
+
+    @BeforeEach
+    void setUp() {
+        mockUser1 = new User(1L, "Дональд", "donald@yandex.ru");
+        mockUser2 = new User(2L, "Джо", "joe@yandex.ru");
+    }
 
     @Test
     @DisplayName("Тест на эндпоинт @PostMapping создания User")
