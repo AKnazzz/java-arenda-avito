@@ -37,8 +37,8 @@ public class BookingRequestDtoTest {
 
 
         assertThat(bookingRequestDtoJsonContent).extractingJsonPathNumberValue("$.itemId").isEqualTo(1);
-        assertThat(bookingRequestDtoJsonContent).extractingJsonPathStringValue("$.start").isEqualTo("2023-01-12T12:12");
-        assertThat(bookingRequestDtoJsonContent).extractingJsonPathStringValue("$.end").isEqualTo("2023-01-13T12:12");
+        assertThat(bookingRequestDtoJsonContent).extractingJsonPathStringValue("$.start").isEqualTo("2023-01-12T12:12:00");
+        assertThat(bookingRequestDtoJsonContent).extractingJsonPathStringValue("$.end").isEqualTo("2023-01-13T12:12:00");
     }
 
     @Test
@@ -46,7 +46,7 @@ public class BookingRequestDtoTest {
     @SneakyThrows
     @Rollback(true)
     void bookingRequestDtoReadTest() {
-        String booking = "{\"itemId\": 1, \"start\": \"2023-01-12T12:12\", \"end\": \"2023-01-13T12:12\"}";
+        String booking = "{\"itemId\": 1, \"start\": \"2023-01-12T12:12:00\", \"end\": \"2023-01-13T12:12:00\"}";
         BookingRequestDto bookingRequestDto = jacksonTester.parseObject(booking);
 
         assertThat(1L).isEqualTo(bookingRequestDto.getItemId());

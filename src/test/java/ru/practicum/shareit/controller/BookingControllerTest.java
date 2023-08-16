@@ -85,8 +85,8 @@ public class BookingControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(bookingResponseDto.getId()))
-                .andExpect(jsonPath("$.start").value(bookingResponseDto.getStart().toString()))
-                .andExpect(jsonPath("$.end").value(bookingResponseDto.getEnd().toString()))
+                .andExpect(jsonPath("$.start").value("2021-12-12T01:01:00"))
+                .andExpect(jsonPath("$.end").value("2021-12-22T01:01:00"))
                 .andExpect(jsonPath("$.status").value(bookingResponseDto.getStatus().toString()))
                 .andDo(print());
         Mockito.verify(bookingService).create(bookingRequestDto, 1L);
@@ -117,8 +117,8 @@ public class BookingControllerTest {
                 .andExpect(jsonPath("$.status").value("APPROVED"))
                 .andExpect(jsonPath("$.id").value(booking.getId()))
                 .andExpect(jsonPath("$.item.id").value(mockItem1.getId()))
-                .andExpect(jsonPath("$.start").value(bookingResponseDto.getStart().toString()))
-                .andExpect(jsonPath("$.end").value(bookingResponseDto.getEnd().toString()));
+                .andExpect(jsonPath("$.start").value("2021-12-12T01:01:00"))
+                .andExpect(jsonPath("$.end").value("2021-12-22T01:01:00"));
 
         verify(bookingService).confirm(booking.getId(), user.getId(), approved);
     }
@@ -142,8 +142,8 @@ public class BookingControllerTest {
                 .andExpect(jsonPath("$.status").value("APPROVED"))
                 .andExpect(jsonPath("$.id").value(booking.getId()))
                 .andExpect(jsonPath("$.item.id").value(mockItem1.getId()))
-                .andExpect(jsonPath("$.start").value(bookingResponseDto.getStart().toString()))
-                .andExpect(jsonPath("$.end").value(bookingResponseDto.getEnd().toString()));
+                .andExpect(jsonPath("$.start").value("2021-12-12T01:01:00"))
+                .andExpect(jsonPath("$.end").value("2021-12-22T01:01:00"));
 
         verify(bookingService).getById(booking.getId(), user.getId());
     }
