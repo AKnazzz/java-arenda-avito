@@ -27,6 +27,7 @@ public class BookingMapper {
                 .start(booking.getStart())
                 .end(booking.getEnd())
                 .item(booking.getItem())
+                .status(booking.getStatus())
                 .booker(booking.getBooker())
                 .build();
     }
@@ -35,6 +36,13 @@ public class BookingMapper {
         return Booking.builder()
                 .start(bookingRequestDto.getStart())
                 .end(bookingRequestDto.getEnd())
+                .build();
+    }
+
+    public static BookingRequestDto bookingToRequest(Booking booking) {
+        return BookingRequestDto.builder()
+                .start(booking.getStart())
+                .end(booking.getEnd())
                 .build();
     }
 

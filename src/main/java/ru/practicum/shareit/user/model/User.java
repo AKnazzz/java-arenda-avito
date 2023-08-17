@@ -9,7 +9,9 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Builder
+@EqualsAndHashCode
 @AllArgsConstructor
+@ToString
 @NoArgsConstructor
 public class User {
     @Id
@@ -19,6 +21,7 @@ public class User {
     private String name;
     @Column(name = "email", nullable = false, unique = true)
     private String email;
+
 }
 
 

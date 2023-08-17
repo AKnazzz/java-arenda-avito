@@ -32,13 +32,13 @@ public class KingHandler {
     }
 
     @ExceptionHandler
-    private ResponseEntity<ExceptionDto> handleUnsupportedStatusException(UnsupportedStatusException ex) {
+    public ResponseEntity<ExceptionDto> handleUnsupportedStatusException(UnsupportedStatusException ex) {
         return new ResponseEntity<>(new ExceptionDto("Unknown state: UNSUPPORTED_STATUS"), HttpStatus.BAD_REQUEST);
     }
 
     @Getter
     @RequiredArgsConstructor
-    private static class ExceptionDto {
+    public static class ExceptionDto {
         private final String error;
 
         @JsonGetter(value = "error")

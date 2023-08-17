@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import ru.practicum.shareit.booking.dto.BookingShortDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @Data
 @Builder
+@EqualsAndHashCode
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ItemResponseDto {
 
@@ -28,6 +30,7 @@ public class ItemResponseDto {
     private Boolean available;
     private BookingShortDto lastBooking;
     private BookingShortDto nextBooking;
+    private Long requestId;
     private List<CommentResponseDto> comments;
 
 
@@ -39,6 +42,7 @@ public class ItemResponseDto {
                 .id(item.getId())
                 .description(item.getDescription())
                 .available(item.getAvailable())
+                .requestId(item.getRequestId())
                 .comments(CommentMapper.listCommentsToListResponse(comments))
                 .build();
     }

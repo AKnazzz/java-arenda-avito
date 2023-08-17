@@ -29,6 +29,7 @@ public class Item {
     @JoinColumn(name = "owner_id", referencedColumnName = "id")
     @ManyToOne(fetch = FetchType.LAZY)
     private User owner;
+    @Column(name = "request_id")
     private Long requestId;
 
 }

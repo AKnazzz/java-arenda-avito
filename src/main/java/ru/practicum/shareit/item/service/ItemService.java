@@ -15,11 +15,11 @@ public interface ItemService {
 
     ItemResponseDto getById(Long id, Long userId);
 
-    List<ItemResponseDto> getAllByOwner(Long userOwnerId);
+    List<ItemResponseDto> getAllByOwner(int from, int size, Long userOwnerId);
 
     void deleteById(Long id, Long userOwnerId);
 
-    List<ItemDto> search(String text, Long userId);
+    List<ItemDto> search(int from, int size, String text, Long userId);
 
     CommentResponseDto addComment(CommentDto commentDto, long itemId, long userId);
 

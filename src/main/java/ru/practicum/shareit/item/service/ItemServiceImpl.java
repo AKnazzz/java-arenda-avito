@@ -2,6 +2,8 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,7 +48,7 @@ public class ItemServiceImpl implements ItemService {
         Item item = ItemMapper.dtoToItem(itemDto);
         item.setOwner(
                 userRepository.findById(userOwnerId).orElseThrow(() -> {
-                    log.info(ITEM_NOT_FOUND_ERROR);
+                    log.info(USER_NOT_FOUND_ERROR);
                     return new EntityNotFoundException(USER_NOT_FOUND_ERROR);
                 }));
         item = itemRepository.save(item);
@@ -98,10 +100,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemResponseDto> getAllByOwner(Long userOwnerId) {
+    public List<ItemResponseDto> getAllByOwner(int from, int size, Long userOwnerId) {
         userRepository.findById(userOwnerId).orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_ERROR));
+        Pageable pageable = PageRequest.of(from == 0 ? 0 : (from / size), size);
 
-        List<ItemResponseDto> itemResponseDtos = itemRepository.findAllByOwnerIdOrderByIdAsc(userOwnerId).stream()
+        List<ItemResponseDto> itemResponseDtos = itemRepository.findAllByOwnerIdOrderByIdAsc(userOwnerId, pageable)
+                .stream()
                 .map(item -> {
                     List<Comment> comments = commentRepository.findAllByItem_Id(item.getId());
                     Booking lastBooking = bookingRepository.findFirstByItemIdAndStartBeforeAndStatusOrderByEndDesc(
@@ -135,7 +139,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> search(String text, Long userId) {
+    public List<ItemDto> search(int from, int size, String text, Long userId) {
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_ERROR));
 
         if (text == null || text.isBlank()) {
@@ -143,7 +147,9 @@ public class ItemServiceImpl implements ItemService {
             return List.of();
         }
 
-        List<Item> items = itemRepository.findByText(text);
+        Pageable pageable = PageRequest.of(from == 0 ? 0 : (from / size), size);
+
+        List<Item> items = itemRepository.findByText(text, pageable);
         log.info("Получен список всех Item  по запросу '{} 'для User с ID {}.", text, userId);
         return ItemMapper.listItemsToListDto(items);
     }

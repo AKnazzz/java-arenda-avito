@@ -1,15 +1,11 @@
 package ru.practicum.shareit.item.mapper;
 
-import ru.practicum.shareit.booking.dto.BookingShortDto;
-import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemResponseDto;
-import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ItemMapper {
@@ -28,7 +24,7 @@ public class ItemMapper {
                 .description(item.getDescription())
                 .available(item.getAvailable())
                 .owner(item.getOwner())
-                // .request(item.getRequest())
+                .requestId(item.getRequestId())
                 .build();
     }
 
@@ -40,6 +36,7 @@ public class ItemMapper {
                 .id(item.getId())
                 .available(item.getAvailable())
                 .description(item.getDescription())
+                .requestId(item.getRequestId())
                 .name(item.getName())
                 .build();
     }
@@ -55,6 +52,7 @@ public class ItemMapper {
                 .description(itemDto.getDescription())
                 .available(itemDto.getAvailable())
                 .owner(itemDto.getOwner())
+                .requestId(itemDto.getRequestId())
                 .build();
     }
 
@@ -66,46 +64,6 @@ public class ItemMapper {
         return items.stream().map(ItemMapper::toResposeItem).collect(Collectors.toList());
     }
 
-    private static BookingShortDto getLastBooking(List<Booking> bookings) {
-        if (bookings.isEmpty()) {
-            return null;
-        }
-        return new BookingShortDto(bookings.get(0).getId(), bookings.get(0).getBooker().getId());
-    }
-
-    private static BookingShortDto getNextBooking(List<Booking> bookings) {
-        if (bookings.size() <= 1 || bookings.get(1) == null) {
-            return null;
-        }
-        return new BookingShortDto(bookings.get(1).getId(), bookings.get(1).getBooker().getId());
-    }
-
-    public static ItemDto itemDtoForOwner(Item item, List<Booking> bookings, List<Comment> comments) {
-        return ItemDto.builder()
-                .id(item.getId())
-                .name(item.getName())
-                .description(item.getDescription())
-                .available(item.getAvailable())
-                .owner(item.getOwner())
-                .lastBooking(getLastBooking(bookings))
-                .nextBooking(getNextBooking(bookings))
-                .comments(comments)
-                .build();
-    }
-
-    public static List<ItemDto> itemDtoForOwner(
-            List<Item> items,
-            Map<Item, List<Booking>> bookings,
-            Map<Item, List<Comment>> comments) {
-        return items.stream()
-                .map(item -> ItemMapper.itemDtoForOwner(
-                        item,
-                        bookings.getOrDefault(item, List.of()),
-                        comments.getOrDefault(item, List.of()))
-                )
-                .collect(Collectors.toList());
-
-    }
 }
 
 

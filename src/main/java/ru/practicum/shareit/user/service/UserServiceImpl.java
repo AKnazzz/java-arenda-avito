@@ -51,7 +51,6 @@ public class UserServiceImpl implements UserService {
         } catch (DataIntegrityViolationException e) {
             throw new EmailDuplicateException("Ошибка дубля Email");
         }
-
     }
 
     @Override

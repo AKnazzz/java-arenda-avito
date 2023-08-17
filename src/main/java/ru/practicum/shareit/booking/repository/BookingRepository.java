@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.repository;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -13,45 +14,49 @@ import java.util.List;
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
-    List<Booking> findBookingByBookerOrderByStartDesc(User user); // возвращает список всех бронирований пользователя,
-    // отсортированных по времени начала, начиная с самого позднего.
+    List<Booking> findBookingByBookerOrderByStartDesc(User user, Pageable pageable); // возвращает список всех
+    // бронирований пользователя, отсортированных по времени начала, начиная с самого позднего.
 
-    List<Booking> findBookingByBookerAndStatusOrderByStartDesc(User user, StatusType state); // возвращает список
+    List<Booking> findBookingByBookerAndStatusOrderByStartDesc(User user, StatusType state,
+            Pageable pageable); // возвращает список
     // всех бронирований пользователя с определённым StatusType, отсортированных по времени начала, начиная с самого позднего
 
     List<Booking> findBookingByBookerAndStartBeforeAndEndAfterOrderByStartDesc(User user, LocalDateTime dateTime,
-            LocalDateTime dateTime1); // возвращает список всех бронирований пользователя, которые происходят
+            LocalDateTime dateTime1,
+            Pageable pageable); // возвращает список всех бронирований пользователя, которые происходят
     // в указанный промежуток времени, отсортированных по времени начала, начиная с самого позднего.
 
-    List<Booking> findBookingByBookerAndEndBeforeOrderByStartDesc(User user, LocalDateTime dateTime); //  находит
+    List<Booking> findBookingByBookerAndEndBeforeOrderByStartDesc(User user, LocalDateTime dateTime,
+            Pageable pageable); //  находит
     // все бронирования, которые были сделаны определенным пользователем и заканчиваются до указанного времени.
     // Бронирования отсортированы по времени начала в обратном порядке, начиная с самого позднего.
 
-    List<Booking> findBookingByBookerAndStartAfterOrderByStartDesc(User user, LocalDateTime dateTime); // находит
+    List<Booking> findBookingByBookerAndStartAfterOrderByStartDesc(User user, LocalDateTime dateTime,
+            Pageable pageable); // находит
     // все бронирования, которые были сделаны определенным пользователем и начинаются после указанного времени.
     // Бронирования отсортированы по времени начала в обратном порядке, начиная с самого позднего.
 
     @Query(value = "SELECT B FROM Booking B WHERE B.item.owner.id = ?1 AND B.status = ?2 order by B.start desc")
-    List<Booking> getBookingsForOwnerByStatus(Long ownerId, StatusType status); //  все бронирования,
+    List<Booking> getBookingsForOwnerByStatus(Long ownerId, StatusType status, Pageable pageable); //  все бронирования,
     // для вещей User Owner и имеют указанный статус. Бронирования отсортированы по времени начала в обратном порядке,
     // начиная с самого позднего.
 
     @Query(value = "SELECT B FROM Booking B WHERE B.item.owner.id = ?1 ORDER BY B.start DESC")
-    List<Booking> getAllBookingsForOwner(Long ownerId); //  все бронирования, для вещей User Owner.
+    List<Booking> getAllBookingsForOwner(Long ownerId, Pageable pageable); //  все бронирования, для вещей User Owner.
     // Бронирования отсортированы по времени начала в обратном порядке, начиная с самого позднего.
 
     @Query(value = "SELECT B FROM Booking B WHERE B.item.owner.id = ?1 AND B.start < ?2 AND B.end > ?3 ORDER BY B.start DESC")
-    List<Booking> getCurrentBookingForOwner(Long ownerId, LocalDateTime date1, LocalDateTime date2);
+    List<Booking> getCurrentBookingForOwner(Long ownerId, LocalDateTime date1, LocalDateTime date2, Pageable pageable);
     // все ТЕКУЩИЕ бронирования, для вещей User Owner. Бронирования отсортированы по времени начала в обратном порядке,
     // начиная с самого позднего.
 
     @Query(value = "SELECT B FROM Booking B WHERE B.item.owner.id = ?1 AND B.end < ?2 ORDER BY B.start DESC")
-    List<Booking> getPastBookingForOwner(Long ownerId, LocalDateTime date);
+    List<Booking> getPastBookingForOwner(Long ownerId, LocalDateTime date, Pageable pageable);
     // все ПРОШЛЫЕ бронирования, для вещей User Owner. Бронирования отсортированы по времени начала в обратном порядке,
     // начиная с самого позднего.
 
     @Query(value = "SELECT B FROM Booking B WHERE B.item.owner.id = ?1 AND B.start > ?2 ORDER BY B.start DESC")
-    List<Booking> getFutureBookingForOwner(Long ownerId, LocalDateTime date);
+    List<Booking> getFutureBookingForOwner(Long ownerId, LocalDateTime date, Pageable pageable);
     // все БУДУЩИЕ бронирования, для вещей User Owner. Бронирования отсортированы по времени начала в обратном порядке,
     // начиная с самого позднего.
 

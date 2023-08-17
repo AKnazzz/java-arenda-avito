@@ -2,6 +2,9 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +42,8 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public BookingResponseDto create(BookingRequestDto bookingRequestDto, Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_ERROR));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_ERROR));
         Item item = itemRepository.findById(bookingRequestDto.getItemId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item не найден."));
         if (!item.getAvailable()) {
@@ -47,7 +51,7 @@ public class BookingServiceImpl implements BookingService {
         }
         if (bookingRequestDto.getStart().isAfter(bookingRequestDto.getEnd()) || bookingRequestDto.getStart()
                 .equals(bookingRequestDto.getEnd())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Start time позде End time у Booking");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Start time позже End time у Booking");
         }
         if (bookingRequestDto.getStart().isBefore(LocalDateTime.now())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Дата начала не может быть в прошлом");
@@ -120,29 +124,33 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingResponseDto> getAllByBooker(int from, int size, String state, Long bookerId) {
-        User user = userRepository.findById(bookerId).orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_ERROR));
+        User user = userRepository.findById(bookerId)
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_ERROR));
         List<Booking> bookList;
+        Pageable pageable = PageRequest.of(from / size, size, Sort.by(Sort.Direction.DESC, "start"));
+
         switch (state) {
             case "ALL": //все
-                bookList = bookingRepository.findBookingByBookerOrderByStartDesc(user);
+                bookList = bookingRepository.findBookingByBookerOrderByStartDesc(user, pageable);
                 break;
             case "WAITING": // ожидающие подтверждения
             case "REJECTED": // отклонённые
                 bookList = bookingRepository.findBookingByBookerAndStatusOrderByStartDesc(user,
-                        StatusType.valueOf(state));
+                        StatusType.valueOf(state), pageable);
                 break;
             case "CURRENT": // текущие
                 LocalDateTime dateTime = LocalDateTime.now();
                 bookList = bookingRepository.findBookingByBookerAndStartBeforeAndEndAfterOrderByStartDesc(user,
-                        dateTime, dateTime);
+                        dateTime, dateTime, pageable);
                 break;
             case "PAST": // завершённые
                 LocalDateTime dateTime1 = LocalDateTime.now();
-                bookList = bookingRepository.findBookingByBookerAndEndBeforeOrderByStartDesc(user, dateTime1);
+                bookList = bookingRepository.findBookingByBookerAndEndBeforeOrderByStartDesc(user, dateTime1, pageable);
                 break;
             case "FUTURE": // будущие
                 LocalDateTime dateTime2 = LocalDateTime.now();
-                bookList = bookingRepository.findBookingByBookerAndStartAfterOrderByStartDesc(user, dateTime2);
+                bookList = bookingRepository.findBookingByBookerAndStartAfterOrderByStartDesc(user, dateTime2,
+                        pageable);
                 break;
             default:
                 throw new UnsupportedStatusException("Неподдерживаемый параметр BookingState");
@@ -154,25 +162,26 @@ public class BookingServiceImpl implements BookingService {
     public List<BookingResponseDto> getAllByOwner(int from, int size, String state, Long ownerId) {
         userRepository.findById(ownerId).orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_ERROR));
         List<Booking> bookList;
+        Pageable pageable = PageRequest.of(from, size, Sort.by(Sort.Direction.DESC, "start"));
         switch (state) {
             case "ALL":
-                bookList = bookingRepository.getAllBookingsForOwner(ownerId);
+                bookList = bookingRepository.getAllBookingsForOwner(ownerId, pageable);
                 break;
             case "WAITING":
             case "REJECTED":
-                bookList = bookingRepository.getBookingsForOwnerByStatus(ownerId, StatusType.valueOf(state));
+                bookList = bookingRepository.getBookingsForOwnerByStatus(ownerId, StatusType.valueOf(state), pageable);
                 break;
             case "CURRENT":
                 LocalDateTime dateTime = LocalDateTime.now();
-                bookList = bookingRepository.getCurrentBookingForOwner(ownerId, dateTime, dateTime);
+                bookList = bookingRepository.getCurrentBookingForOwner(ownerId, dateTime, dateTime, pageable);
                 break;
             case "PAST":
                 LocalDateTime dateTime1 = LocalDateTime.now();
-                bookList = bookingRepository.getPastBookingForOwner(ownerId, dateTime1);
+                bookList = bookingRepository.getPastBookingForOwner(ownerId, dateTime1, pageable);
                 break;
             case "FUTURE":
                 LocalDateTime dateTime2 = LocalDateTime.now();
-                bookList = bookingRepository.getFutureBookingForOwner(ownerId, dateTime2);
+                bookList = bookingRepository.getFutureBookingForOwner(ownerId, dateTime2, pageable);
                 break;
             default:
                 throw new UnsupportedStatusException("Неподдерживаемый параметр BookingState");
