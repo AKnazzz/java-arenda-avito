@@ -11,8 +11,6 @@ import ru.practicum.shareit.item.mapper.CommentMapper;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
@@ -20,13 +18,9 @@ import java.util.List;
 @EqualsAndHashCode
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ItemResponseDto {
-
     private Long id;
-    @NotBlank
     private String name;
-    @NotBlank
     private String description;
-    @NotNull
     private Boolean available;
     private BookingShortDto lastBooking;
     private BookingShortDto nextBooking;

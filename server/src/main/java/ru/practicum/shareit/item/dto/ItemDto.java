@@ -8,8 +8,6 @@ import ru.practicum.shareit.booking.dto.BookingShortDto;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.user.model.User;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
@@ -18,12 +16,8 @@ import java.util.List;
 public class ItemDto {
 
     private Long id;
-
-    @NotBlank
     private String name;
-    @NotBlank
     private String description;
-    @NotNull
     private Boolean available;
     @JsonIgnore
     private User owner;

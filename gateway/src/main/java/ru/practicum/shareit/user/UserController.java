@@ -1,16 +1,15 @@
-package ru.practicum.shareit.user.controller;
+package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.service.UserService;
 
-import java.util.List;
+import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 
 @RestController
 @RequestMapping(path = "/users")
@@ -19,39 +18,38 @@ import java.util.List;
 @Validated
 public class UserController {
 
-    private final UserService userService;
+    private final UserClient userClient;
 
     @PostMapping
-    public ResponseEntity<UserDto> userCreate(@RequestBody UserDto userDto, BindingResult bindingResult) {
+    public ResponseEntity<Object> userCreate(@Valid @RequestBody UserDto userDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(userDto);
         }
         log.info("Получен POST запрос по эндпоинту /users на добавление User {}.", userDto);
-        return new ResponseEntity<>(userService.create(userDto), HttpStatus.CREATED);
+        return userClient.userCreate(userDto);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDto> getById(@PathVariable Long id) {
+    public ResponseEntity<Object> getById(@PathVariable @Positive Long id) {
         log.info("Получен GET запрос по эндпоинту /users/{} на получение User с ID {}.", id, id);
-        return new ResponseEntity<>(userService.getById(id), HttpStatus.OK);
+        return userClient.getById(id);
     }
 
     @GetMapping
-    public ResponseEntity<List<UserDto>> geAllUsers() {
+    public ResponseEntity<Object> geAllUsers() {
         log.info("Получен GET запрос по эндпоинту /users на получение всех существующих Users.");
-        return new ResponseEntity<>(userService.getAll(), HttpStatus.OK);
+        return userClient.geAllUsers();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<Object> deleteUser(@PathVariable @Positive Long id) {
         log.info("Получен DELETE запрос по эндпоинту /users/{} на удаление User с ID {}.", id, id);
-        userService.deleteById(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return userClient.deleteUser(id);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
+    public ResponseEntity<Object> updateUser(@PathVariable @Positive Long id, @RequestBody UserDto userDto) {
         log.info("Получен PATCH запрос по эндпоинту /users/{} на одновление данных User с ID {}.", id, id);
-        return new ResponseEntity<>(userService.update(id, userDto), HttpStatus.OK);
+        return userClient.updateUser(id, userDto);
     }
 }

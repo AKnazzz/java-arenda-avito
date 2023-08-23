@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.CommentResponseDto;
@@ -12,14 +11,10 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.item.service.ItemService;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 
 @Slf4j
-@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/items")
@@ -28,7 +23,7 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping
-    public ResponseEntity<ItemDto> itemCreate(@Valid @RequestBody ItemDto itemDto,
+    public ResponseEntity<ItemDto> itemCreate(@RequestBody ItemDto itemDto,
             @RequestHeader(value = "X-Sharer-User-Id") Long userOwnerId) {
         log.info("Получен POST запрос по эндпоинту /items от User(Owner) c ID {} на добавление Item {}.", userOwnerId,
                 itemDto);
@@ -36,7 +31,7 @@ public class ItemController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ItemResponseDto> getById(@PathVariable @Positive Long id,
+    public ResponseEntity<ItemResponseDto> getById(@PathVariable Long id,
             @RequestHeader(value = "X-Sharer-User-Id") Long userId) {
         log.info("Получен GET запрос по эндпоинту /items/{} от User c ID {} на получение Item с ID {}.", id, userId,
                 id);
@@ -45,8 +40,8 @@ public class ItemController {
 
     @GetMapping
     public ResponseEntity<List<ItemResponseDto>> geAllItemsByOwner(
-            @RequestParam(defaultValue = "0", required = false) @PositiveOrZero int from,
-            @RequestParam(defaultValue = "10", required = false) @Positive int size,
+            @RequestParam(defaultValue = "0", required = false) int from,
+            @RequestParam(defaultValue = "10", required = false) int size,
             @RequestHeader(value = "X-Sharer-User-Id") Long userOwnerId) {
         log.info("Получен GET запрос по эндпоинту /items от User(Owner) c ID {} на получение списка всех своих Items.",
                 userOwnerId);
@@ -54,7 +49,7 @@ public class ItemController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteItem(@PathVariable @Positive Long id,
+    public ResponseEntity<?> deleteItem(@PathVariable Long id,
             @RequestHeader(value = "X-Sharer-User-Id") Long userOwnerId) {
         log.info("Получен DELETE запрос по эндпоинту /items/{} от User(Owner) c ID {} на удаление Item с ID {}.", id,
                 userOwnerId, id);
@@ -63,7 +58,7 @@ public class ItemController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updateItem(@PathVariable @Positive Long id, @RequestBody ItemDto itemDto,
+    public ResponseEntity<?> updateItem(@PathVariable Long id, @RequestBody ItemDto itemDto,
             @RequestHeader(value = "X-Sharer-User-Id") Long userOwnerId) {
         log.info(
                 "Получен PATCH запрос по эндпоинту /items/{} от User(Owner) c ID {} на обновление данных Item с ID {}.",
@@ -73,8 +68,8 @@ public class ItemController {
 
     @GetMapping("/search")
     public ResponseEntity<List<ItemDto>> searchItem(
-            @RequestParam(defaultValue = "0", required = false) @PositiveOrZero int from,
-            @RequestParam(defaultValue = "10", required = false) @Positive int size,
+            @RequestParam(defaultValue = "0", required = false) int from,
+            @RequestParam(defaultValue = "10", required = false) int size,
             @RequestParam(name = "text") String text1,
             @RequestHeader(value = "X-Sharer-User-Id") Long userId) {
         log.info(
@@ -84,9 +79,9 @@ public class ItemController {
     }
 
     @PostMapping("/{itemId}/comment")
-    public ResponseEntity<CommentResponseDto> addComment(@PathVariable("itemId") @Positive long itemId,
-            @RequestHeader(value = "X-Sharer-User-Id") @Positive Long userId,
-            @Valid @RequestBody CommentDto commentDto) {
+    public ResponseEntity<CommentResponseDto> addComment(@PathVariable("itemId") long itemId,
+            @RequestHeader(value = "X-Sharer-User-Id") Long userId,
+            @RequestBody CommentDto commentDto) {
         log.info("Получен POST запрос по эндпоинту /items/{}/comment от User c ID {} на создание Comment {}.", itemId,
                 userId, commentDto);
         return new ResponseEntity<>(itemService.addComment(commentDto, itemId, userId), HttpStatus.OK);

@@ -52,27 +52,28 @@ public class BookingController {
 
     @PostMapping
     public ResponseEntity<Object> bookingCreate(@Valid @RequestBody BookingRequestDto bookingRequestDto,
-                                                @RequestHeader(value = "X-Sharer-User-Id") @Positive Long userId) {
+            @RequestHeader(value = "X-Sharer-User-Id") @Positive Long userId) {
         log.info("Получен POST запрос по эндпоинту /bookings на добавление Bookings {}.", bookingRequestDto);
-
+        return bookingClient.bookingCreate(bookingRequestDto, userId);
     }
 
     @PatchMapping("/{bookingId}")
     public ResponseEntity<Object> confirm(@PathVariable("bookingId") @Positive long bookingId,
-                                          @RequestParam(name = "approved") boolean approved,
-                                          @RequestHeader("X-Sharer-User-Id") @Positive long userOwnerId) {
+            @RequestParam(name = "approved") boolean approved,
+            @RequestHeader("X-Sharer-User-Id") @Positive long userOwnerId) {
         log.info(
                 "Получен PATCH запрос по эндпоинту /bookings/{} от User(Owner) c ID {} статус подтверждения "
                         + "(approved = {}) Booking с ID {}.",
                 bookingId, userOwnerId, approved, bookingId);
-
+        return bookingClient.confirm(bookingId, approved, userOwnerId);
     }
 
     @GetMapping("/{bookingId}")
     public ResponseEntity<Object> getById(@PathVariable("bookingId") @Positive long bookingId,
-                                          @RequestHeader(value = "X-Sharer-User-Id") @Positive Long userId) { // либо автор брони, либо Owner
+            @RequestHeader(value = "X-Sharer-User-Id") @Positive Long userId) { // либо автор брони, либо Owner
         log.info("Получен GET запрос по эндпоинту /bookings/{} от User c ID {} на получение Booking с ID {}.",
                 bookingId, userId, bookingId);
+        return bookingClient.getById(bookingId, userId);
     }
 
     @GetMapping
@@ -84,6 +85,7 @@ public class BookingController {
         log.info(
                 "Получен GET запрос по эндпоинту /bookings от User c ID {} на получение списка всех Booking этого User.",
                 bookerId);
+        return bookingClient.getAllByBooker(state, from, size, bookerId);
     }
 
     @GetMapping("/owner")
@@ -96,6 +98,7 @@ public class BookingController {
                 "Получен GET запрос по эндпоинту /bookings/owner от User c ID {} на получение списка всех Booking всех "
                         + "Items для которых он Owner.",
                 ownerId);
+        return bookingClient.getAllByOwner(state, from, size, ownerId);
     }
 
 }
