@@ -7,7 +7,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
-import ru.practicum.shareit.validation.ValuesAllowedConstraint;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
@@ -48,15 +47,7 @@ public class BookingController {
     }
 
     @GetMapping
-    public ResponseEntity<Object> getAllByBooker(@ValuesAllowedConstraint(propName = "state",
-                                                  values = {"all",
-                                                          "current",
-                                                          "past",
-                                                          "future",
-                                                          "waiting",
-                                                          "rejected"},
-                                                  message = "Unknown state: UNSUPPORTED_STATUS")
-            @RequestParam(defaultValue = "ALL") String state,
+    public ResponseEntity<Object> getAllByBooker(@RequestParam(defaultValue = "ALL") String state,
             @RequestParam(defaultValue = "0", required = false) @PositiveOrZero int from,
             @RequestParam(defaultValue = "10", required = false) @Positive int size,
             @RequestHeader("X-Sharer-User-Id") @Positive long bookerId) {
@@ -67,15 +58,7 @@ public class BookingController {
     }
 
     @GetMapping("/owner")
-    public ResponseEntity<Object> getAllByOwner(@ValuesAllowedConstraint(propName = "state",
-                                            values = {"all",
-                                                    "current",
-                                                    "past",
-                                                    "future",
-                                                    "waiting",
-                                                    "rejected"},
-                                            message = "Unknown state: UNSUPPORTED_STATUS")
-            @RequestParam(defaultValue = "ALL") String state,
+    public ResponseEntity<Object> getAllByOwner(@RequestParam(defaultValue = "ALL") String state,
             @RequestParam(defaultValue = "0", required = false) @PositiveOrZero int from,
             @RequestParam(defaultValue = "10", required = false) @Positive int size,
             @RequestHeader("X-Sharer-User-Id") @Positive long ownerId) {
