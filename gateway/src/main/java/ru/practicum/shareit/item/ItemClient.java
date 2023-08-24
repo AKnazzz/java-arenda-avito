@@ -52,9 +52,9 @@ public class ItemClient extends BaseClient {
         return patch("/" + id, userOwnerId, itemDto);
     }
 
-    public ResponseEntity<Object> searchItem(int from, int size, String searchText, Long userId) {
+    public ResponseEntity<Object> searchItem(int from, int size, String text1, Long userId) {
         Map<String, Object> parameters = Map.of(
-                "text", searchText,
+                "text", text1,
                 "from", from,
                 "size", size
         );
