@@ -70,12 +70,12 @@ public class ItemController {
     public ResponseEntity<List<ItemDto>> searchItem(
             @RequestParam(defaultValue = "0", required = false) int from,
             @RequestParam(defaultValue = "10", required = false) int size,
-            @RequestParam(name = "searchText") String text1,
+            @RequestParam(name = "text") String searchText,
             @RequestHeader(value = "X-Sharer-User-Id") Long userId) {
         log.info(
                 "Получен GET запрос по эндпоинту /items/search от User c ID {} на получение списка Item по запросу '{}'.",
-                userId, text1);
-        return new ResponseEntity<>(itemService.search(from, size, text1, userId), HttpStatus.OK);
+                userId, searchText);
+        return new ResponseEntity<>(itemService.search(from, size, searchText, userId), HttpStatus.OK);
     }
 
     @PostMapping("/{itemId}/comment")
