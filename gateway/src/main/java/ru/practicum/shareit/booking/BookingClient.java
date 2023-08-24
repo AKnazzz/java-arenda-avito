@@ -41,7 +41,7 @@ public class BookingClient extends BaseClient {
 
     public ResponseEntity<Object> getAllByBooker(String stateParam, int from, int size, long bookerId) {
         BookingState state = BookingState.from(stateParam)
-                .orElseThrow(() -> new IllegalArgumentException("Unknown state: " + stateParam));
+                .orElseThrow(() -> new UnsupportedStatusException("Неподдерживаемый параметр BookingState"));
         Map<String, Object> parameters = Map.of(
                 "state", state.name(),
                 "from", from,
@@ -52,7 +52,7 @@ public class BookingClient extends BaseClient {
 
     public ResponseEntity<Object> getAllByOwner(String stateParam, int from, int size, long ownerId) {
         BookingState state = BookingState.from(stateParam)
-                .orElseThrow(() -> new IllegalArgumentException("Unknown state: " + stateParam));
+                .orElseThrow(() -> new UnsupportedStatusException("Неподдерживаемый параметр BookingState"));
         Map<String, Object> parameters = Map.of(
                 "state", state.name().toUpperCase(),
                 "from", from,
