@@ -8,14 +8,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.validation.ConstraintViolationException;
+
 @RestControllerAdvice
 public class KingHandler {
 
-//    @ExceptionHandler(ConstraintViolationException.class)
-//    public ResponseEntity<?> constraintViolationException(final ConstraintViolationException e) {
-//        return new ResponseEntity<>(new ErrorResponse(String.valueOf(e.getClass()), e.getMessage()),
-//                HttpStatus.BAD_REQUEST);
-//    }
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<?> constraintViolationException(final ConstraintViolationException e) {
+        return new ResponseEntity<>(new ErrorResponse(String.valueOf(e.getClass()), e.getMessage()),
+                HttpStatus.BAD_REQUEST);
+    }
 
     @ExceptionHandler(EmailDuplicateException.class)
     public ResponseEntity<?> emailDuplicateException(final EmailDuplicateException e) {

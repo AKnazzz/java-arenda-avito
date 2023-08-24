@@ -8,7 +8,9 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
+import ru.practicum.shareit.booking.dto.BookingState;
 import ru.practicum.shareit.client.BaseClient;
+import ru.practicum.shareit.exception.UnsupportedStatusException;
 
 import java.util.Map;
 
@@ -38,18 +40,22 @@ public class BookingClient extends BaseClient {
         return get("/" + bookingId, userId);
     }
 
-    public ResponseEntity<Object> getAllByBooker(String state, int from, int size, long bookerId) {
+    public ResponseEntity<Object> getAllByBooker(String stateParam, int from, int size, long bookerId) {
+        BookingState state = BookingState.from(stateParam)
+                .orElseThrow(() -> new UnsupportedStatusException("Неподдерживаемый параметр BookingState"));
         Map<String, Object> parameters = Map.of(
-                "state", state,
+                "state", state.name(),
                 "from", from,
                 "size", size
         );
         return get("?state={state}&from={from}&size={size}", bookerId, parameters);
     }
 
-    public ResponseEntity<Object> getAllByOwner(String state, int from, int size, long ownerId) {
+    public ResponseEntity<Object> getAllByOwner(String stateParam, int from, int size, long ownerId) {
+        BookingState state = BookingState.from(stateParam)
+                .orElseThrow(() -> new UnsupportedStatusException("Неподдерживаемый параметр BookingState"));
         Map<String, Object> parameters = Map.of(
-                "state", state,
+                "state", state.name().toUpperCase(),
                 "from", from,
                 "size", size
         );
