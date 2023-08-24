@@ -62,8 +62,8 @@ public class UserServiceImpl implements UserService {
         // }
         // log.info("User c ID {} не найден.", id);
         // throw new EntityNotFoundException("User не найден");
-        return userMapper.userToDto(userRepository.findById(userId)
-        .orElseThrow(() -> new EntityNotFoundException("Такого пользователя не существует")));
+        return UserMapper.userToDto(userRepository.findById(id)
+        .orElseThrow(() -> new EntityNotFoundException("User не найден")));
     }
 
 
