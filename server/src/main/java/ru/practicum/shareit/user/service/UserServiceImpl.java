@@ -13,7 +13,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
-// import java.util.Optional;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -55,15 +55,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getById(Long id) {
-                return UserMapper.userToDto(userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User не найден")));
-        // Optional<User> user = userRepository.findById(id);
-        // if (user.isPresent()) {
-        //     log.info("User c ID {} получен.", id);
-        //     return UserMapper.userToDto(user.get());
-        // }
-        // log.info("User c ID {} не найден.", id);
-        // throw new EntityNotFoundException("User не найден");
+        Optional<User> user = userRepository.findById(id);
+        if (user.isPresent()) {
+            log.info("User c ID {} получен.", id);
+            return UserMapper.userToDto(user.get());
+        }
+        log.info("User c ID {} не найден.", id);
+        throw new EntityNotFoundException("User не найден");
     }
 
 
