@@ -70,7 +70,7 @@ public class ItemController {
     public ResponseEntity<List<ItemDto>> searchItem(
             @RequestParam(defaultValue = "0", required = false) int from,
             @RequestParam(defaultValue = "10", required = false) int size,
-            @RequestParam(name = "text") String text1,
+            @RequestParam(name = "searchText") String text1,
             @RequestHeader(value = "X-Sharer-User-Id") Long userId) {
         log.info(
                 "Получен GET запрос по эндпоинту /items/search от User c ID {} на получение списка Item по запросу '{}'.",

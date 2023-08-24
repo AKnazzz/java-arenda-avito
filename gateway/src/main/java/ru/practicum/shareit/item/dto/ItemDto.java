@@ -18,10 +18,5 @@ public class ItemDto {
     private String description;
     @NotNull
     private Boolean available;
-    //    @JsonIgnore
-//    private User owner;
     private Long requestId;
-//    private BookingShortDto lastBooking;
-//    private BookingShortDto nextBooking;
-//    private List<Comment> comments;
 }

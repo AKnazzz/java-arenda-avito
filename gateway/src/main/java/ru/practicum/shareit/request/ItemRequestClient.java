@@ -33,7 +33,7 @@ public class ItemRequestClient extends BaseClient {
 
     @GetMapping
     public ResponseEntity<Object> getAllForRequestor(Long userId) {
-        return get("", userId);
+        return get("/", userId);
     }
 
     public ResponseEntity<Object> getAll(int from, int size, Long userId) {

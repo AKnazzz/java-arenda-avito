@@ -4,12 +4,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "/users")
@@ -23,7 +26,11 @@ public class UserController {
     @PostMapping
     public ResponseEntity<Object> userCreate(@Valid @RequestBody UserDto userDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(userDto);
+            List<String> errors = new ArrayList<>();
+            for (FieldError error : bindingResult.getFieldErrors()) {
+                errors.add(error.getDefaultMessage());
+            }
+            return ResponseEntity.badRequest().body(errors);
         }
         log.info("Получен POST запрос по эндпоинту /users на добавление User {}.", userDto);
         return userClient.userCreate(userDto);
